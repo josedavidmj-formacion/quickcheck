@@ -1,7 +1,6 @@
 package quickcheck
 
 import common._
-
 import org.scalacheck._
 import Arbitrary._
 import Gen._
@@ -157,6 +156,38 @@ abstract class QuickCheckHeap extends Properties("Heap") with IntHeap {
     val j = deleteMin(meld(h, i))
     val minmeld = findMin(j)
     ((minh <= minmeld) || (mini <= minmeld)) && inOrder(j)
+  }
+  
+  property("deleteMinLeavesSortedHeap") = forAll { (a: Int, b: Int, c: Int, d: Int, e: Int) =>
+    val h = insert(a, empty)
+    val i = insert(b, h)
+    val j = insert(c, i)
+    val k0 = insert (d, j)
+    val k = insert (e, k0)
+    val n = findMin(k)
+    val z = deleteMin(k)
+    val y = insert(n, z)
+    val w = meld(z, k)
+    val v = meld(z, k0)
+    val u = meld (z, z)
+    val t = meld (z, i)
+    val s = deleteMin(z)
+    val r = insert(a, s)
+    val q = insert (b, s)
+    val p = insert (c, s)
+    inOrder(z) && inOrder(y) && (findMin(y) == n) && inOrder(w) && inOrder(v) &&
+    inOrder(u) && inOrder(t) && inOrder(s) && inOrder(r) && inOrder(q) && 
+    inOrder(p)
+    
+  }
+  
+  property("deleteMinLeavesSortedHeap2") = forAll { (h: H) =>
+    val a = findMin(h)
+    val z = deleteMin(h)
+    val y = if (isEmpty(z)) empty else deleteMin(z)
+    val b = if (isEmpty(z)) a else findMin(z)
+    val x = insert(a, z)
+    inOrder(z) && inOrder(y) && (a <= b) && inOrder(x) && (findMin(x) == a)
   }
 
 }
